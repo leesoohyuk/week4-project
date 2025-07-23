@@ -5,3 +5,6 @@ librosa
 scipy
 numpy
 soundfile
+basic-pitch
+mido
+music21

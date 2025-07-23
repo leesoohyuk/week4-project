@@ -179,11 +179,6 @@ const SongDetailPage: React.FC = () => {
                   >
                     {downloading ? '다운로드 중...' : 'MP3 다운로드 및 재생'}
                     </button>
-                    {audioUrl && (
-                      <div className="mt-4">
-                        <audio controls src={audioUrl} className="w-full" />
-                      </div>
-                      )}
                   </div>
                   <div className="mt-4">
                     <button
