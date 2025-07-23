@@ -105,3 +105,18 @@ export const requestDownload = async (videoUrl: string): Promise<string> => {
   const data = await res.json();
   return `http://localhost:5001/${data.file}`; // 실제 MP3 URL 반환
 };
+/**
+ * 서버에 분석 요청
+ * @param videoId 유튜브 영상 ID
+ * @returns 분석 결과
+ */
+export const analyzeSong = async (videoId: string) => {
+  const res = await fetch('http://localhost:5001/analyze', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ videoId }),
+  });
+
+  if (!res.ok) throw new Error('분석 실패');
+  return await res.json();
+};

@@ -1,1 +1,3 @@
-pip install flask flask-cors yt-dlp
+bash
+
+pip install -r requirements.txt

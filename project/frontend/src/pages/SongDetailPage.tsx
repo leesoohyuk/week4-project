@@ -9,6 +9,7 @@ import ChordProgression from '../components/ChordProgression';
 import { getSongDetail } from '../utils/api';
 import { requestDownload } from '../utils/api';
 import { SongDetail } from '../types/song';
+import { analyzeSong } from '../utils/api';
 
 const SongDetailPage: React.FC = () => {
   const { videoId } = useParams<{ videoId: string }>();
@@ -19,6 +20,8 @@ const SongDetailPage: React.FC = () => {
   const [error, setError] = useState<string>('');
   const [audioUrl, setAudioUrl] = useState('');
   const [downloading, setDownloading] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
+
 
 
   useEffect(() => {
@@ -46,6 +49,20 @@ const SongDetailPage: React.FC = () => {
 
   const handleSearch = (query: string) => {
     navigate(`/search?q=${encodeURIComponent(query)}`);
+  };
+
+  const handleAnalyze = async () => {
+  if (!videoId) return;
+  try {
+    setAnalyzing(true);
+    const result = await analyzeSong(videoId);
+    setSongDetail(prev => prev ? { ...prev, ...result } : result);  // 덮어쓰기
+  } catch (err) {
+    alert('분석 중 오류가 발생했습니다.');
+    console.error(err);
+  } finally {
+    setAnalyzing(false);
+    }
   };
 
   if (loading) {
@@ -167,6 +184,15 @@ const SongDetailPage: React.FC = () => {
                         <audio controls src={audioUrl} className="w-full" />
                       </div>
                       )}
+                  </div>
+                  <div className="mt-4">
+                    <button
+                      className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                      onClick={handleAnalyze}
+                      disabled={analyzing}
+                    >
+                      {analyzing ? '분석 중...' : '코드 자동 분석'}
+                    </button>
                   </div>
               </div>
             </div>
