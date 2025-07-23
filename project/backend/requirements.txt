@@ -8,3 +8,4 @@ soundfile
 basic-pitch
 mido
 music21
+soundfile
