@@ -8,19 +8,19 @@ pnpm-debug.log*
 lerna-debug.log*
 
 # Node.js & Frontend
-frontend/node_modules/
+project/frontend/node_modules/
 dist/
 dist-ssr/
 
 # Python Backend
 backend/venv/
 backend/__pycache__/
-backend/downloads/*.mp3
+project/backend/downloads/*.mp3
 *.pyc
 
 # Env files
 frontend/.env
-frontend/.env.local
+project/frontend/.env.local
 frontend/.env.*.local
 frontend/*.local
 
