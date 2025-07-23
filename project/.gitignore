@@ -15,6 +15,7 @@ dist-ssr/
 # Python Backend
 backend/venv/
 backend/__pycache__/
+backend/downloads/*.mp3
 *.pyc
 
 # Env files

@@ -7,6 +7,7 @@ import YouTubePlayer from '../components/YouTubePlayer';
 import ChordChart from '../components/ChordChart';
 import ChordProgression from '../components/ChordProgression';
 import { getSongDetail } from '../utils/api';
+import { requestDownload } from '../utils/api';
 import { SongDetail } from '../types/song';
 
 const SongDetailPage: React.FC = () => {
@@ -16,6 +17,9 @@ const SongDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState(0);
   const [error, setError] = useState<string>('');
+  const [audioUrl, setAudioUrl] = useState('');
+  const [downloading, setDownloading] = useState(false);
+
 
   useEffect(() => {
     if (!videoId) {
@@ -139,6 +143,31 @@ const SongDetailPage: React.FC = () => {
                   <span className="text-gray-500">조성:</span>
                   <p className="font-semibold">({songDetail.key})</p>
                 </div>
+                <div className="mt-6">
+                  <button onClick={async () => {
+                    if (!videoId) return;
+                    try {
+                      setDownloading(true);
+                      const mp3Url = await requestDownload(`https://www.youtube.com/watch?v=${videoId}`);
+                      setAudioUrl(mp3Url);
+                    } catch (err) {
+                      console.error('MP3 다운로드 실패:', err);
+                      alert('MP3 다운로드 중 문제가 발생했습니다.');
+                    } finally {
+                      setDownloading(false);
+                    }
+                  }}
+                  className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800 disabled:opacity-50"
+                  disabled={downloading}
+                  >
+                    {downloading ? '다운로드 중...' : 'MP3 다운로드 및 재생'}
+                    </button>
+                    {audioUrl && (
+                      <div className="mt-4">
+                        <audio controls src={audioUrl} className="w-full" />
+                      </div>
+                      )}
+                  </div>
               </div>
             </div>
           </div>

@@ -85,3 +85,23 @@ export const getSongDetail = async (
     // contentDetails 등 추가 정보가 필요하면 여기에 할당
   };
 };
+
+/**
+ * 서버에 다운로드 요청
+ * @param videoUrl 다운로드할 유튜브 영상 URL
+ * @returns 다운로드된 MP3 파일의 URL
+ */
+export const requestDownload = async (videoUrl: string): Promise<string> => {
+  const res = await fetch('http://localhost:5001/download', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ url: videoUrl }),
+  });
+
+  if (!res.ok) throw new Error('다운로드 실패');
+
+  const data = await res.json();
+  return `http://localhost:5001/${data.file}`; // 실제 MP3 URL 반환
+};
