@@ -1,4 +1,4 @@
-# main.py ver.2
+# main.py ver.4
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import yt_dlp
@@ -6,7 +6,7 @@ import os
 import uuid
 import librosa
 import numpy as np
-from scipy.signal import find_peaks
+import math
 import json
 import logging
 from pathlib import Path
@@ -18,16 +18,6 @@ CORS(app)
 
 OUTPUT_DIR = "downloads"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
-
-# 기본 코드 진행 패턴 (예시)
-COMMON_CHORD_PROGRESSIONS = {
-    'C': ['C', 'Am', 'F', 'G'],
-    'G': ['G', 'Em', 'C', 'D'],
-    'D': ['D', 'Bm', 'G', 'A'],
-    'A': ['A', 'F#m', 'D', 'E'],
-    'E': ['E', 'C#m', 'A', 'B'],
-    'F': ['F', 'Dm', 'Bb', 'C']
-}
 
 # 기타 코드 차트 데이터
 CHORD_CHARTS = {
@@ -48,6 +38,79 @@ CHORD_CHARTS = {
 }
 
 KEYS = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
+
+# ---- 추가: 코드 템플릿/디코딩 유틸 ----
+MAJOR = np.array([0, 4, 7])
+MINOR = np.array([0, 3, 7])
+
+def build_chord_templates():
+    """24개(12메이저+12마이너) 코드 템플릿 반환"""
+    names = []
+    mats = []
+    for i, root in enumerate(KEYS):
+        vecM = np.zeros(12); vecM[(i + MAJOR) % 12] = 1
+        vecm = np.zeros(12); vecm[(i + MINOR) % 12] = 1
+        mats.append(vecM / vecM.sum()); names.append(root)
+        mats.append(vecm / vecm.sum()); names.append(root + "m")
+    return names, np.array(mats, dtype=float)
+
+def viterbi_decode(score_matrix, switch_penalty=0.2):
+    """
+    score_matrix: (T, N)  값이 클수록 그 코드일 확률이 높다고 봄
+    switch_penalty: 코드가 바뀔 때 패널티
+    """
+    T, N = score_matrix.shape
+    dp = np.zeros((T, N), dtype=float)
+    back = np.zeros((T, N), dtype=int)
+
+    dp[0] = score_matrix[0]
+    for t in range(1, T):
+        # 이전 상태 값에 패널티 적용
+        trans = dp[t-1][:, None] - switch_penalty
+        stay_or_switch = np.maximum(trans.max(axis=0), dp[t-1])  # stay vs switch
+        best_prev = np.argmax(trans, axis=0)
+        dp[t] = score_matrix[t] + stay_or_switch
+        back[t] = np.where(dp[t-1] >= trans.max(axis=0), np.arange(N), best_prev)
+
+    path = np.zeros(T, dtype=int)
+    path[-1] = np.argmax(dp[-1])
+    for t in range(T-2, -1, -1):
+        path[t] = back[t+1, path[t+1]]
+    return path
+
+def merge_segments(idx_path, chord_names, times, min_dur=0.5):
+    """프레임별 인덱스를 타임라인으로 병합"""
+    segs = []
+    start = 0
+    cur = idx_path[0]
+    for i in range(1, len(idx_path)):
+        if idx_path[i] != cur:
+            dur = float(times[i] - times[start])
+            if dur >= min_dur:
+                segs.append({
+                    "chord": chord_names[cur],
+                    "timestamp": float(times[start]),
+                    "duration": dur
+                })
+            start = i
+            cur = idx_path[i]
+    # 마지막 세그먼트
+    dur = float(times[-1] - times[start])
+    if dur >= min_dur:
+        segs.append({
+            "chord": chord_names[cur],
+            "timestamp": float(times[start]),
+            "duration": dur
+        })
+    return segs
+
+def estimate_key_from_chords(chords):
+    """추출된 코드들의 루트 다수결로 키 추정(간단버전)"""
+    roots = [c.replace("m", "") for c in chords]
+    if not roots:
+        return "C"
+    return max(set(roots), key=roots.count)
+# ---- /추가 ----
 
 def download_audio_from_youtube(video_url: str, out_dir: str) -> str:
     tmp_id = uuid.uuid4().hex
@@ -113,61 +176,59 @@ def safe_key(y, sr):
     except Exception:
         return 'C'
 
-def build_chord_timeline(chords, duration_per=4.0, repeats=4):
-    timeline = []
-    t = 0.0
-    for _ in range(repeats):
-        for ch in chords:
-            timeline.append({
-                "chord": ch,
-                "timestamp": t,
-                "duration": duration_per
-            })
-            t += duration_per
-    return timeline
-
 def analyze_audio_for_chords(audio_path):
-    """오디오 파일을 분석해서 코드 진행을 추출"""
-    # 실패 시 기본값 리턴 대신 예외를 던지고, 라우터에서 잡아도 됨.
-    # 여기서는 그대로 리턴하되 원인 로그는 확실히 남김.
+    """오디오에서 코드/타임라인 추출 (librosa만 사용)"""
     try:
         y, sr = safe_load_audio(audio_path, duration=60)
-        tempo = safe_tempo(y, sr)
-        est_key = safe_key(y, sr)
 
-        # 진행 패턴 얻기
-        prog = COMMON_CHORD_PROGRESSIONS.get(est_key, COMMON_CHORD_PROGRESSIONS['C'])
+        # 1) 하모닉/퍼커시브 분리 → 하모닉만 사용
+        y_h, _ = librosa.effects.hpss(y)
 
-        chords = build_chord_timeline(prog, duration_per=4.0, repeats=4)
+        # 2) 비트 트래킹
+        tempo_raw, beat_frames = librosa.beat.beat_track(y=y_h, sr=sr)
 
-        # 코드 다이어그램
-        unique = list(dict.fromkeys(prog))  # 순서유지 중복제거
-        chord_charts = [CHORD_CHARTS.get(c, CHORD_CHARTS['C']) for c in unique]
+        # tempo를 확실히 float로 변환
+        tempo_val = float(np.asarray(tempo_raw).reshape(-1)[0])
+        if math.isnan(tempo_val) or tempo_val <= 0:
+            tempo_val = 120
+
+        # ★추가★ 비트 프레임 -> 시간(초)
+        beat_times = librosa.frames_to_time(beat_frames, sr=sr)
+
+        # 3) 크로마 (CQT 추천) + 비트 싱크
+        chroma = librosa.feature.chroma_cqt(y=y_h, sr=sr, bins_per_octave=36)
+        chroma_sync = librosa.util.sync(chroma, beat_frames, aggregate=np.median).T  # (T, 12)
+
+        # 4) 템플릿 매칭
+        chord_names, templates = build_chord_templates()
+        # cosine 유사도
+        norm_chroma = chroma_sync / (np.linalg.norm(chroma_sync, axis=1, keepdims=True) + 1e-9)
+        norm_temp = templates / (np.linalg.norm(templates, axis=1, keepdims=True) + 1e-9)
+        sims = norm_chroma @ norm_temp.T  # (T, 24)
+
+        # 5) Viterbi로 연속성 보정
+        path = viterbi_decode(sims, switch_penalty=0.15)
+
+        # 6) 타임라인 병합
+        chord_segments = merge_segments(path, chord_names, beat_times, min_dur=0.5)
+
+        # 7) 키 추정
+        est_key = estimate_key_from_chords([seg["chord"] for seg in chord_segments])
+
+        # 8) 코드 다이어그램
+        unique = list(dict.fromkeys([seg["chord"] for seg in chord_segments]))
+        chord_charts = [CHORD_CHARTS.get(c, CHORD_CHARTS["C"]) for c in unique if c in CHORD_CHARTS]
 
         return {
-            "bpm": int(round(tempo)),
+            "bpm": int(round(tempo_val)),
             "signature": "4/4",
             "key": f"{est_key} Major",
-            "chords": chords,
+            "chords": chord_segments,
             "chordCharts": chord_charts
         }
     except Exception as e:
         logging.exception(f"Audio analysis failed: {e}")
         raise
-        # 최소한의 기본값 (원하면 raise 해서 500 반환)
-        return {
-            'bpm': 120,
-            'signature': '4/4',
-            'key': 'C Major',
-            'chords': [
-                {'chord': 'C', 'timestamp': 0, 'duration': 4},
-                {'chord': 'Am', 'timestamp': 4, 'duration': 4},
-                {'chord': 'F', 'timestamp': 8, 'duration': 4},
-                {'chord': 'G', 'timestamp': 12, 'duration': 4}
-            ],
-            'chordCharts': [CHORD_CHARTS['C'], CHORD_CHARTS['Am'], CHORD_CHARTS['F'], CHORD_CHARTS['G']]
-        }
-
 
 @app.route("/download", methods=["POST"])
 def download_audio():
