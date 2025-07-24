@@ -36,14 +36,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder={placeholder}
-        className="w-full px-6 py-4 text-gray-800 bg-white rounded-full border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 pr-14"
+        className="w-full px-6 py-4 text-gray-600 bg-white rounded-full border-2 border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 pr-16 shadow-sm"
       />
       <button
         type="button"
         onClick={handleSearchClick}
-        className="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 text-gray-600 hover:text-gray-800 transition-colors duration-200"
+        className="absolute right-2 top-1/2 transform -translate-y-1/2 p-3 bg-gray-800 text-white rounded-full hover:bg-gray-700 transition-colors duration-200"
       >
-        <Search size={24} />
+        <Search size={20} />
       </button>
     </form>
   );
