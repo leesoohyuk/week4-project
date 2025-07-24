@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { ChevronUp, ChevronDown } from 'lucide-react';
 import SearchBar from '../components/SearchBar';
 import SongCard from '../components/SongCard';
 import { searchSongs } from '../utils/api';
@@ -58,6 +59,14 @@ const SearchPage: React.FC = () => {
     }
   };
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const scrollToBottom = () => {
+    window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       if (
@@ -76,7 +85,17 @@ const SearchPage: React.FC = () => {
       {/* Fixed search bar */}
       <div className="sticky top-0 bg-white z-50 border-b border-gray-200 p-4">
         <div className="max-w-4xl mx-auto">
-          <SearchBar onSearch={handleSearch} placeholder="paste youtube link or search song" />
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate('/')}
+              className="text-2xl font-bold text-black hover:text-gray-700 transition-colors duration-200 flex-shrink-0"
+            >
+              AutoChord
+            </button>
+            <div className="flex-1">
+              <SearchBar onSearch={handleSearch} placeholder="어떤 노래를 연주할까요?" />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -117,6 +136,24 @@ const SearchPage: React.FC = () => {
             )}
           </>
         )}
+      </div>
+
+      {/* Scroll buttons */}
+      <div className="fixed bottom-6 right-6 flex flex-col gap-2 z-40">
+        <button
+          onClick={scrollToTop}
+          className="p-3 bg-black text-white rounded-full shadow-lg hover:bg-gray-800 transition-colors duration-200"
+          title="맨 위로"
+        >
+          <ChevronUp size={20} />
+        </button>
+        <button
+          onClick={scrollToBottom}
+          className="p-3 bg-black text-white rounded-full shadow-lg hover:bg-gray-800 transition-colors duration-200"
+          title="맨 아래로"
+        >
+          <ChevronDown size={20} />
+        </button>
       </div>
     </div>
   );
