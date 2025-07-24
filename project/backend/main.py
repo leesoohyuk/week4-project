@@ -1,4 +1,4 @@
-# main.py ver.4
+# main.py ver.5
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import yt_dlp
@@ -10,6 +10,7 @@ import math
 import json
 import logging
 from pathlib import Path
+from scipy.ndimage import gaussian_filter1d
 
 logging.basicConfig(level=logging.INFO)
 
@@ -211,6 +212,8 @@ def analyze_audio_for_chords(audio_path):
     """오디오에서 코드/타임라인 추출 (librosa만 사용)"""
     try:
         y, sr = safe_load_audio(audio_path, duration=60)
+        # ───── RMS 정규화 (볼륨 편차 줄이기) ─────
+        y = y / (np.sqrt(np.mean(y**2)) + 1e-6)
 
         # 1) 하모닉/퍼커시브 분리 → 하모닉만 사용
         y_h, _ = librosa.effects.hpss(y)
@@ -219,15 +222,22 @@ def analyze_audio_for_chords(audio_path):
         tempo_raw, beat_frames = librosa.beat.beat_track(y=y_h, sr=sr)
 
         # tempo를 확실히 float로 변환
+        # round, float 변환
         tempo_val = float(np.asarray(tempo_raw).reshape(-1)[0])
+        # 너무 작으면 ×2, 너무 크면 ÷2
+        if tempo_val < 60:
+            tempo_val *= 2
+        elif tempo_val > 200:
+            tempo_val /= 2
+        tempo_val = max(40, min(tempo_val, 300))
         if math.isnan(tempo_val) or tempo_val <= 0:
             tempo_val = 120
 
         # ★추가★ 비트 프레임 -> 시간(초)
         beat_times = librosa.frames_to_time(beat_frames, sr=sr)
 
-        # 3) 크로마 (CQT 추천) + 비트 싱크
-        chroma = librosa.feature.chroma_cqt(y=y_h, sr=sr, bins_per_octave=36)
+        # 3) 크로마 CENS (노이즈에 더 강함) + 비트 싱크
+        chroma = librosa.feature.chroma_cens(y=y_h, sr=sr, hop_length=512)
         chroma_sync = librosa.util.sync(
             chroma, beat_frames, aggregate=np.median).T  # (T, 12)
 
@@ -238,7 +248,9 @@ def analyze_audio_for_chords(audio_path):
             (np.linalg.norm(chroma_sync, axis=1, keepdims=True) + 1e-9)
         norm_temp = templates / \
             (np.linalg.norm(templates, axis=1, keepdims=True) + 1e-9)
-        sims = norm_chroma @ norm_temp.T  # (T, 24)
+        sims = norm_chroma @ norm_temp.T
+        # ───── Gaussian으로 시간축 평활화 ─────
+        sims = gaussian_filter1d(sims, sigma=1.0, axis=0)
 
         # 5) Viterbi로 연속성 보정
         path = viterbi_decode(sims, switch_penalty=0.15)
