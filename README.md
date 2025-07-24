@@ -19,6 +19,11 @@ YouTube Data API v3와 React/Vite로 만든 코드·영상 검색 & 재생 웹�
 2. YouTube Data API v3 사용 가능한 API 키 발급  
    - [Google Cloud Platform 콘솔](https://console.cloud.google.com/apis/library/youtube.googleapis.com)에서 “YouTube Data API v3” 활성화 후 API 키 생성  
 3. Git 클라이언트  
+4. ffmpeg 다운로드
+   - 다운로드 | [ffmpeg builds](https://www.gyan.dev/ffmpeg/builds/) 
+   - 압축 해제 | `C:\ffmpeg\ffmpeg\bin\ffmpeg.exe` 확인 
+   - 환경변수 설정 | `C:\ffmpeg\ffmpeg\bin` 을 Path에 추가 
+   - 확인 | `ffmpeg -version` 실행해 확인 
 
 ---
 
