@@ -83,8 +83,12 @@ def merge_segments(idx_path, chord_names, times, min_dur=0.5):
     segs = []
     start = 0
     cur = idx_path[0]
-    for i in range(1, len(idx_path)):
+    limit = min(len(idx_path), len(times))  # 인덱스 초과 방지
+
+    for i in range(1, limit):
         if idx_path[i] != cur:
+            if i >= len(times) or start >= len(times):
+                continue  # 안전하게 스킵
             dur = float(times[i] - times[start])
             if dur >= min_dur:
                 segs.append({
@@ -94,14 +98,16 @@ def merge_segments(idx_path, chord_names, times, min_dur=0.5):
                 })
             start = i
             cur = idx_path[i]
-    # 마지막 세그먼트
-    dur = float(times[-1] - times[start])
-    if dur >= min_dur:
-        segs.append({
-            "chord": chord_names[cur],
-            "timestamp": float(times[start]),
-            "duration": dur
-        })
+
+    # 마지막 세그먼트 처리
+    if start < len(times) and (limit - 1) < len(times):
+        dur = float(times[limit - 1] - times[start])
+        if dur >= min_dur:
+            segs.append({
+                "chord": chord_names[cur],
+                "timestamp": float(times[start]),
+                "duration": dur
+            })
     return segs
 
 def estimate_key_from_chords(chords):
@@ -150,7 +156,6 @@ def download_audio_from_youtube(video_url: str, out_dir: str) -> str:
         raise ValueError("Downloaded audio seems invalid/too small.")
 
     return final_path
-
 
 def safe_load_audio(path, duration=60):
     if not os.path.exists(path) or os.path.getsize(path) < 2048:
