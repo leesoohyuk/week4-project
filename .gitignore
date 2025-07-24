@@ -20,6 +20,7 @@ project/backend/downloads/*.mp3
 
 # Env files
 frontend/.env
+project/backend/.env
 project/frontend/.env.local
 frontend/.env.*.local
 frontend/*.local

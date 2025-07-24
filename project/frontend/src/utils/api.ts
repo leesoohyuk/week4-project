@@ -18,6 +18,7 @@ export interface SongDetail {
 }
 
 const API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY;
+const SERVER_URL = import.meta.env.VITE_API_SERVER_URL;
 
 /**
  * 유튜브에서 영상 리스트 검색
@@ -92,7 +93,7 @@ export const getSongDetail = async (
  * @returns 다운로드된 MP3 파일의 URL
  */
 export const requestDownload = async (videoUrl: string): Promise<string> => {
-  const res = await fetch('http://localhost:5001/download', {
+  const res = await fetch(`${SERVER_URL}/download`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -103,7 +104,7 @@ export const requestDownload = async (videoUrl: string): Promise<string> => {
   if (!res.ok) throw new Error('다운로드 실패');
 
   const data = await res.json();
-  return `http://localhost:5001/${data.file}`; // 실제 MP3 URL 반환
+  return `${SERVER_URL}/${data.file}`; // 실제 MP3 URL 반환
 };
 /**
  * 서버에 분석 요청
@@ -111,7 +112,7 @@ export const requestDownload = async (videoUrl: string): Promise<string> => {
  * @returns 분석 결과
  */
 export const analyzeSong = async (videoId: string) => {
-  const res = await fetch('http://localhost:5001/analyze', {
+  const res = await fetch(`${SERVER_URL}/analyze`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ videoId }),
