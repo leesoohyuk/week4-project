@@ -107,10 +107,20 @@ const SongDetailPage: React.FC = () => {
       {/* Fixed search bar */}
       <div className="sticky top-0 bg-white z-50 border-b border-gray-200 p-4">
         <div className="max-w-7xl mx-auto">
-          <SearchBar
-            onSearch={handleSearch}
-            placeholder="paste youtube link or search song"
-          />
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate('/')}
+              className="text-2xl font-bold text-black hover:text-gray-700 transition-colors duration-200 flex-shrink-0"
+            >
+              AutoChord
+            </button>
+            <div className="flex-1">
+              <SearchBar
+                onSearch={handleSearch}
+                placeholder="어떤 노래를 연주할까요?"
+              />
+            </div>
+          </div>
         </div>
       </div>
 
