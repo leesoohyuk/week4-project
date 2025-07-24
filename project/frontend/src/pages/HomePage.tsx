@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import SearchBar from '../components/SearchBar';
+import MusicChart from '../components/MusicChart';
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -22,6 +23,11 @@ const HomePage: React.FC = () => {
             className="w-full"
           />
         </div>
+      </div>
+      
+      {/* 인기 차트 섹션 */}
+      <div className="w-full max-w-6xl mt-16">
+        <MusicChart />
       </div>
     </div>
   );

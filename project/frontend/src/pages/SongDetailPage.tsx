@@ -6,6 +6,7 @@ import SearchBar from '../components/SearchBar';
 import YouTubePlayer from '../components/YouTubePlayer';
 import ChordChart from '../components/ChordChart';
 import ChordProgression from '../components/ChordProgression';
+import SongRecommendations from '../components/SongRecommendations';
 import { getSongDetail } from '../utils/api';
 import { requestDownload } from '../utils/api';
 import { SongDetail } from '../types/song';
@@ -200,6 +201,17 @@ const SongDetailPage: React.FC = () => {
                     </button>
                   </div>
               </div>
+            </div>
+
+            {/* 추천 곡 섹션 */}
+            <div className="mt-6">
+              <SongRecommendations 
+                currentSong={{
+                  title: songDetail.title,
+                  channelTitle: songDetail.channelTitle,
+                  videoId: videoId
+                }}
+              />
             </div>
           </div>
         </div>

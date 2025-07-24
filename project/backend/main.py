@@ -21,38 +21,55 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 # 기타 코드 차트 데이터
 CHORD_CHARTS = {
-    'C': {'chord': 'C', 'frets': [0, 3, 2, 0, 1, 0], 'fingers': [0, 3, 2, 0, 1, 0]},
-    'Am': {'chord': 'Am', 'frets': [0, 0, 2, 2, 1, 0], 'fingers': [0, 0, 2, 3, 1, 0]},
-    'F': {'chord': 'F', 'frets': [1, 3, 3, 2, 1, 1], 'fingers': [1, 3, 4, 2, 1, 1]},
-    'G': {'chord': 'G', 'frets': [3, 2, 0, 0, 3, 3], 'fingers': [3, 1, 0, 0, 4, 4]},
-    'Em': {'chord': 'Em', 'frets': [0, 2, 2, 0, 0, 0], 'fingers': [0, 1, 2, 0, 0, 0]},
-    'D': {'chord': 'D', 'frets': [-1, 0, 0, 2, 3, 2], 'fingers': [0, 0, 0, 1, 3, 2]},
-    'Bm': {'chord': 'Bm', 'frets': [2, 2, 4, 4, 3, 2], 'fingers': [1, 1, 3, 4, 2, 1]},
-    'A': {'chord': 'A', 'frets': [0, 0, 2, 2, 2, 0], 'fingers': [0, 0, 1, 2, 3, 0]},
-    'E': {'chord': 'E', 'frets': [0, 2, 2, 1, 0, 0], 'fingers': [0, 2, 3, 1, 0, 0]},
+    'A':   {'chord': 'A',   'frets': [0, 0, 2, 2, 2, 0], 'fingers': [0, 0, 1, 2, 3, 0]},
+    'A#':  {'chord': 'A#',  'frets': [1, 1, 3, 3, 3, 1], 'fingers': [1, 1, 2, 3, 4, 1]},
+    'A#m': {'chord': 'A#m', 'frets': [1, 1, 3, 3, 2, 1], 'fingers': [1, 1, 3, 4, 2, 1]},
+    'Am':  {'chord': 'Am',  'frets': [0, 0, 2, 2, 1, 0], 'fingers': [0, 0, 2, 3, 1, 0]},
+    'B':   {'chord': 'B',   'frets': [2, 2, 4, 4, 4, 2], 'fingers': [1, 1, 2, 3, 4, 1]},
+    'Bb':  {'chord': 'Bb',  'frets': [1, 1, 3, 3, 3, 1], 'fingers': [1, 1, 2, 3, 4, 1]},
+    'Bm':  {'chord': 'Bm',  'frets': [2, 2, 4, 4, 3, 2], 'fingers': [1, 1, 3, 4, 2, 1]},
+    'C':   {'chord': 'C',   'frets': [0, 3, 2, 0, 1, 0], 'fingers': [0, 3, 2, 0, 1, 0]},
+    'C#':  {'chord': 'C#',  'frets': [-1, 4, 6, 6, 6, 4], 'fingers': [0, 1, 3, 4, 2, 1]},
     'C#m': {'chord': 'C#m', 'frets': [4, 4, 6, 6, 5, 4], 'fingers': [1, 1, 3, 4, 2, 1]},
-    'B': {'chord': 'B', 'frets': [2, 2, 4, 4, 4, 2], 'fingers': [1, 1, 2, 3, 4, 1]},
-    'Dm': {'chord': 'Dm', 'frets': [-1, 0, 0, 2, 3, 1], 'fingers': [0, 0, 0, 2, 3, 1]},
-    'Bb': {'chord': 'Bb', 'frets': [1, 1, 3, 3, 3, 1], 'fingers': [1, 1, 2, 3, 4, 1]},
-    'F#m': {'chord': 'F#m', 'frets': [2, 4, 4, 2, 2, 2], 'fingers': [1, 3, 4, 1, 1, 1]}
+    'Cm':  {'chord': 'Cm',  'frets': [-1, 3, 5, 5, 4, 3], 'fingers': [0, 1, 3, 4, 2, 1]},
+    'D':   {'chord': 'D',   'frets': [-1, 0, 0, 2, 3, 2], 'fingers': [0, 0, 0, 1, 3, 2]},
+    'D#':  {'chord': 'D#',  'frets': [-1, 6, 8, 8, 8, 6], 'fingers': [0, 1, 3, 4, 2, 1]},
+    'D#m': {'chord': 'D#m', 'frets': [-1, 6, 8, 8, 7, 6], 'fingers': [0, 1, 3, 4, 2, 1]},
+    'Dm':  {'chord': 'Dm',  'frets': [-1, 0, 0, 2, 3, 1], 'fingers': [0, 0, 0, 2, 3, 1]},
+    'E':   {'chord': 'E',   'frets': [0, 2, 2, 1, 0, 0], 'fingers': [0, 2, 3, 1, 0, 0]},
+    'Em':  {'chord': 'Em',  'frets': [0, 2, 2, 0, 0, 0], 'fingers': [0, 1, 2, 0, 0, 0]},
+    'F':   {'chord': 'F',   'frets': [1, 3, 3, 2, 1, 1], 'fingers': [1, 3, 4, 2, 1, 1]},
+    'F#':  {'chord': 'F#',  'frets': [2, 4, 4, 3, 2, 2], 'fingers': [1, 3, 4, 2, 1, 1]},
+    'Fm':  {'chord': 'Fm',  'frets': [1, 3, 3, 1, 1, 1], 'fingers': [1, 3, 4, 1, 1, 1]},
+    'F#m': {'chord': 'F#m', 'frets': [2, 4, 4, 2, 2, 2], 'fingers': [1, 3, 4, 1, 1, 1]},
+    'G':   {'chord': 'G',   'frets': [3, 2, 0, 0, 3, 3], 'fingers': [3, 1, 0, 0, 4, 4]},
+    'G#':  {'chord': 'G#',  'frets': [4, 6, 6, 5, 4, 4], 'fingers': [1, 3, 4, 2, 1, 1]},
+    'G#m': {'chord': 'G#m', 'frets': [4, 6, 6, 4, 4, 4], 'fingers': [1, 3, 4, 1, 1, 1]},
+    'Gm':  {'chord': 'Gm',  'frets': [3, 3, 5, 5, 3, 3], 'fingers': [1, 1, 3, 4, 1, 1]},
 }
 
-KEYS = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
+KEYS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 
 # ---- 추가: 코드 템플릿/디코딩 유틸 ----
 MAJOR = np.array([0, 4, 7])
 MINOR = np.array([0, 3, 7])
+
 
 def build_chord_templates():
     """24개(12메이저+12마이너) 코드 템플릿 반환"""
     names = []
     mats = []
     for i, root in enumerate(KEYS):
-        vecM = np.zeros(12); vecM[(i + MAJOR) % 12] = 1
-        vecm = np.zeros(12); vecm[(i + MINOR) % 12] = 1
-        mats.append(vecM / vecM.sum()); names.append(root)
-        mats.append(vecm / vecm.sum()); names.append(root + "m")
+        vecM = np.zeros(12)
+        vecM[(i + MAJOR) % 12] = 1
+        vecm = np.zeros(12)
+        vecm[(i + MINOR) % 12] = 1
+        mats.append(vecM / vecM.sum())
+        names.append(root)
+        mats.append(vecm / vecm.sum())
+        names.append(root + "m")
     return names, np.array(mats, dtype=float)
+
 
 def viterbi_decode(score_matrix, switch_penalty=0.2):
     """
@@ -67,16 +84,19 @@ def viterbi_decode(score_matrix, switch_penalty=0.2):
     for t in range(1, T):
         # 이전 상태 값에 패널티 적용
         trans = dp[t-1][:, None] - switch_penalty
-        stay_or_switch = np.maximum(trans.max(axis=0), dp[t-1])  # stay vs switch
+        stay_or_switch = np.maximum(
+            trans.max(axis=0), dp[t-1])  # stay vs switch
         best_prev = np.argmax(trans, axis=0)
         dp[t] = score_matrix[t] + stay_or_switch
-        back[t] = np.where(dp[t-1] >= trans.max(axis=0), np.arange(N), best_prev)
+        back[t] = np.where(dp[t-1] >= trans.max(axis=0),
+                           np.arange(N), best_prev)
 
     path = np.zeros(T, dtype=int)
     path[-1] = np.argmax(dp[-1])
     for t in range(T-2, -1, -1):
         path[t] = back[t+1, path[t+1]]
     return path
+
 
 def merge_segments(idx_path, chord_names, times, min_dur=0.5):
     """프레임별 인덱스를 타임라인으로 병합"""
@@ -110,6 +130,7 @@ def merge_segments(idx_path, chord_names, times, min_dur=0.5):
             })
     return segs
 
+
 def estimate_key_from_chords(chords):
     """추출된 코드들의 루트 다수결로 키 추정(간단버전)"""
     roots = [c.replace("m", "") for c in chords]
@@ -117,6 +138,7 @@ def estimate_key_from_chords(chords):
         return "C"
     return max(set(roots), key=roots.count)
 # ---- /추가 ----
+
 
 def download_audio_from_youtube(video_url: str, out_dir: str) -> str:
     tmp_id = uuid.uuid4().hex
@@ -157,6 +179,7 @@ def download_audio_from_youtube(video_url: str, out_dir: str) -> str:
 
     return final_path
 
+
 def safe_load_audio(path, duration=60):
     if not os.path.exists(path) or os.path.getsize(path) < 2048:
         raise ValueError("Audio file missing or too small.")
@@ -165,12 +188,14 @@ def safe_load_audio(path, duration=60):
         raise ValueError("Empty audio array.")
     return y, sr
 
+
 def safe_tempo(y, sr):
     try:
         tempo, _ = librosa.beat.beat_track(y=y, sr=sr)
         return 120 if (tempo is None or np.isnan(tempo) or tempo == 0) else float(tempo)
     except Exception:
         return 120
+
 
 def safe_key(y, sr):
     try:
@@ -180,6 +205,7 @@ def safe_key(y, sr):
         return KEYS[idx]
     except Exception:
         return 'C'
+
 
 def analyze_audio_for_chords(audio_path):
     """오디오에서 코드/타임라인 추출 (librosa만 사용)"""
@@ -202,27 +228,33 @@ def analyze_audio_for_chords(audio_path):
 
         # 3) 크로마 (CQT 추천) + 비트 싱크
         chroma = librosa.feature.chroma_cqt(y=y_h, sr=sr, bins_per_octave=36)
-        chroma_sync = librosa.util.sync(chroma, beat_frames, aggregate=np.median).T  # (T, 12)
+        chroma_sync = librosa.util.sync(
+            chroma, beat_frames, aggregate=np.median).T  # (T, 12)
 
         # 4) 템플릿 매칭
         chord_names, templates = build_chord_templates()
         # cosine 유사도
-        norm_chroma = chroma_sync / (np.linalg.norm(chroma_sync, axis=1, keepdims=True) + 1e-9)
-        norm_temp = templates / (np.linalg.norm(templates, axis=1, keepdims=True) + 1e-9)
+        norm_chroma = chroma_sync / \
+            (np.linalg.norm(chroma_sync, axis=1, keepdims=True) + 1e-9)
+        norm_temp = templates / \
+            (np.linalg.norm(templates, axis=1, keepdims=True) + 1e-9)
         sims = norm_chroma @ norm_temp.T  # (T, 24)
 
         # 5) Viterbi로 연속성 보정
         path = viterbi_decode(sims, switch_penalty=0.15)
 
         # 6) 타임라인 병합
-        chord_segments = merge_segments(path, chord_names, beat_times, min_dur=0.5)
+        chord_segments = merge_segments(
+            path, chord_names, beat_times, min_dur=0.5)
 
         # 7) 키 추정
-        est_key = estimate_key_from_chords([seg["chord"] for seg in chord_segments])
+        est_key = estimate_key_from_chords(
+            [seg["chord"] for seg in chord_segments])
 
         # 8) 코드 다이어그램
         unique = list(dict.fromkeys([seg["chord"] for seg in chord_segments]))
-        chord_charts = [CHORD_CHARTS.get(c, CHORD_CHARTS["C"]) for c in unique if c in CHORD_CHARTS]
+        chord_charts = [CHORD_CHARTS.get(
+            c, CHORD_CHARTS["C"]) for c in unique if c in CHORD_CHARTS]
 
         return {
             "bpm": int(round(tempo_val)),
@@ -234,6 +266,7 @@ def analyze_audio_for_chords(audio_path):
     except Exception as e:
         logging.exception(f"Audio analysis failed: {e}")
         raise
+
 
 @app.route("/download", methods=["POST"])
 def download_audio():
@@ -264,6 +297,7 @@ def download_audio():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 @app.route("/analyze", methods=["POST"])
 def analyze_song():
     data = request.get_json(silent=True) or {}
@@ -289,6 +323,7 @@ def analyze_song():
                 os.remove(audio_path)
         except:
             pass
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5001, debug=True)
