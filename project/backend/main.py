@@ -328,13 +328,6 @@ def analyze_song():
     except Exception as e:
         app.logger.exception("Analyze failed")
         return jsonify({"error": str(e)}), 500
-    finally:
-        # 정리
-        try:
-            if 'audio_path' in locals() and os.path.exists(audio_path):
-                os.remove(audio_path)
-        except:
-            pass
 
 
 if __name__ == "__main__":

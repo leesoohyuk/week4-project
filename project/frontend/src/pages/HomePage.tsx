@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import SearchBar from '../components/SearchBar';
 import MusicChart from '../components/MusicChart';
+import LoginButton from '../components/LoginButton';
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -12,6 +13,11 @@ const HomePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4">
+      {/* 로그인 버튼 - 우상단 고정 */}
+      <div className="fixed top-4 right-4 z-40">
+        <LoginButton />
+      </div>
+      
       <div className="text-center mb-12 w-full max-w-2xl">
         <h1 className="text-6xl font-bold text-black mb-[80px]">AutoChord</h1> 
         <div className="w-full h-px bg-gray-300 mx-auto mb-[50px]"></div> 

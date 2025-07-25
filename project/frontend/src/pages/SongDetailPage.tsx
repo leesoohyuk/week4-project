@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import SearchBar from '../components/SearchBar';
 import YouTubePlayer from '../components/YouTubePlayer';
+import LoginButton from '../components/LoginButton';
 import ChordChart from '../components/ChordChart';
 import ChordProgression from '../components/ChordProgression';
 import SongRecommendations from '../components/SongRecommendations';
@@ -105,6 +106,11 @@ const SongDetailPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* 로그인 버튼 - 우상단 고정 */}
+      <div className="fixed top-4 right-4 z-40">
+        <LoginButton />
+      </div>
+      
       {/* Fixed search bar */}
       <div className="sticky top-0 bg-white z-50 border-b border-gray-200 p-4">
         <div className="max-w-7xl mx-auto">

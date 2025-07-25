@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import SearchBar from '../components/SearchBar';
 import SongCard from '../components/SongCard';
+import LoginButton from '../components/LoginButton';
 import { searchSongs } from '../utils/api';
 import { Song } from '../types/song';
 
@@ -82,6 +83,11 @@ const SearchPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* 로그인 버튼 - 우상단 고정 */}
+      <div className="fixed top-4 right-4 z-40">
+        <LoginButton />
+      </div>
+      
       {/* Fixed search bar */}
       <div className="sticky top-0 bg-white z-50 border-b border-gray-200 p-4">
         <div className="max-w-4xl mx-auto">
